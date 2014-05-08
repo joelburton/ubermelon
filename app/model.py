@@ -10,6 +10,7 @@ class Melon(db.Model):
     id          = db.Column(db.Integer, primary_key=True)
     melon_type  = db.Column(db.String(30))
     common_name = db.Column(db.String(30))
+    price       = db.Column(db.Numeric(8, 2))
 
 
 class Customer(db.Model):
@@ -77,26 +78,41 @@ class Customer(db.Model):
             return c
 
 
-""""
 class Order(db.Model):
     __tablename__ = 'orders'
 
-    id
-    customer_id
-    ship_address
-    ship_city
-    ship_state
-    ship_postalcode
-    subtotal
-    tax
-    delivery
-    totalamount
+    id                 = db.Column(db.Integer, primary_key=True)
+    customer_id        = db.Column(db.Integer, db.ForeignKey('customers.id'), nullable=False, index=True)
 
+    status             = db.Column(db.Enum('New', 'Processing', 'Out for Delivery', 'Delivered', 'Canceled'))
+    created_at         = db.Column(db.Integer, nullable=False) # epoch datetime
+
+    shipto_address1    = db.Column(db.String(40))
+    shipto_address2    = db.Column(db.String(40))
+    shipto_city        = db.Column(db.String(35))
+    shipto_state       = db.Column(db.String(35))
+    shipto_postalcode  = db.Column(db.String(10))
+
+    subtotal           = db.Column(db.Numeric(10, 2))
+    tax                = db.Column(db.Numeric(10, 2))
+    delivery_method    = db.Column(db.String(20))
+    delivery_amount    = db.Column(db.Numeric(10, 2))
+    order_total        = db.Column(db.Numeric(10, 2))
+    
 
 
 class OrderItems(db.Model):
     __tablename__ = 'order_items'
 
+    id            = db.Column(db.Integer, primary_key=True)
+    order_id      = db.Column(db.Integer, db.ForeignKey('orders.id'), nullable=False, index=True)
+    melon_id      = db.Column(db.Integer, db.ForeignKey('melons.id'), nullable=False, index=True)
+    quantity      = db.Column(db.Integer, default=1)
+    unit_price    = db.Column(db.Numeric(8, 2))
+    total_price   = db.Column(db.Numeric(10, 2))
+    
+
+""""
 
 class Salespeople(db.Model):
     __tablename__ = 'salespeople'
