@@ -11,6 +11,9 @@ class Melon(db.Model):
     id          = db.Column(db.Integer, primary_key=True)
     melon_type  = db.Column(db.String(30))
     common_name = db.Column(db.String(30))
+    seedless    = db.Column(db.Boolean)
+    flesh_color = db.Column(db.String(30))
+    rind_color  = db.Column(db.String(30))
     price       = db.Column(db.Numeric(8, 2))
     imgurl      = db.Column(db.String(200))
 
@@ -91,6 +94,7 @@ class Order(db.Model):
 
     status             = db.Column(db.Enum('New', 'Processing', 'Out for Delivery', 'Delivered', 'Canceled'))
     created_at         = db.Column(db.Integer, nullable=False) # epoch datetime
+    delivered_at       = db.Column(db.Integer, nullable=True)  # epoch datetime
     salesperson_id     = db.Column(db.Integer, db.ForeignKey('salespeople.id'), nullable=True, index=True)
 
     shipto_address1    = db.Column(db.String(40))
@@ -117,6 +121,8 @@ class Order(db.Model):
         o = Order()
         o.status = random.choice(o.status_list)
         o.created_at = int(time.time()) - (60*60*24) * (random.random() * 100)
+        if o.status == 'Delivered':
+            o.delivered_at = o.created_at + (random.random() * 60*60*24*2) + (60*60*3)
 
         # Get a random customer record
         c = None
