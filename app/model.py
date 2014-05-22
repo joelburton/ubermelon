@@ -146,9 +146,9 @@ class Order(db.Model):
         else:
             o.shipto_address1   = c.shipto_address1
             o.shipto_address2   = c.shipto_address2
-            o.city              = c.shipto_city
-            o.state             = c.shipto_state
-            o.postalcode        = c.shipto_postalcode
+            o.shipto_city       = c.shipto_city
+            o.shipto_state      = c.shipto_state
+            o.shipto_postalcode = c.shipto_postalcode
 
         o.delivery_method = random.choice(o.delivery_method_list)
         o.delivery_amount = int ( (random.random() * 1800) + 200 ) / 100.0
