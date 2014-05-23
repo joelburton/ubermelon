@@ -46,6 +46,8 @@ class Customer(db.Model):
 
     region             = db.Column(db.String(20))
 
+    def name(self):
+        return ' '.join([self.givenname, self.surname])
 
     # Generate a fake record
     @staticmethod
@@ -67,6 +69,10 @@ class Customer(db.Model):
                 gender          = forgery_py.personal.gender(),
 
             )
+        
+        # Forgery generates telephone numbers with a random country code prefix
+        #   just strip that off for now
+        c.telephone = c.telephone[2:]
         
         # There's a 24% chance the billing and shipping address might differ
         if random.random() < .24:
@@ -213,6 +219,9 @@ class SalesPerson(db.Model):
 
     region        = db.Column(db.String(20))
 
+    def name(self):
+        return ' '.join([self.givenname, self.surname])
+    
 
     # Generate a fake record
     @staticmethod

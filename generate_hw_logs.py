@@ -1,6 +1,10 @@
 #
 # generates sample log files for homeworks
 #
+# To generate a new sample file, just add a function to this
+#   file with a name that starts with "homework".  It will automatically
+#   be run every time this script is run.
+#
 
 import json
 import datetime
@@ -83,7 +87,7 @@ def homework02_log():
         f.close()
 
 # Generate 3 log files, one for each week of deliveries
-def homework02_log_old():
+def old_homework02_log():
     hwpath = HOMEWORK_DIR + '/hw02'
     dircheck(hwpath)
 
@@ -125,7 +129,82 @@ def homework02_log_old():
             f.write("\n")
 
         f.close()
+
+
+# customers and how many melons they ordered / paid for for single type of melon
+# pick one type of melon
+# customer name, no. of melon, how much they paid
+# randomly have some people pay less than the full price
+
+def homework04_csv():
+    hwpath = HOMEWORK_DIR + '/hw04'
+    dircheck(hwpath)
+
+    report_csv = hwpath + '/customer_orders.csv'
     
+    # Load the Customers
+    customers = Customer.query.all()
+    
+    # Pick a Melon
+    melon = Melon.query.get(1)
+    
+    f = open(report_csv, 'w')
+    for customer in customers:
+        melon_count = 0
+        amount_due = 0.0
+        
+        # Get the number of melons (of the one we're looking for)
+        #  that this customer has ordered
+        for order in customer.orders:
+            for item in order.items:
+                if item.melon_id == melon.id:
+                    melon_count += item.quantity
+                    amount_due += item.quantity * float(melon.price)
+    
+        if melon_count > 0:
+            # 30% chance they haven't paid everything
+            orig_amount = amount_due
+            if random.random() < .3:
+                amount_due *= random.random()   # subtract a random percentage
+            
+            f.write(','.join([
+                str(customer.id),
+                customer.name(),
+                str(melon_count),
+                "%0.2f" % amount_due,
+#                "%0.2f" % orig_amount
+            ]))
+            f.write("\n")
+    
+    f.close()
+    
+
+
+# Generates sales report
+def homework05_csv():
+    hwpath = HOMEWORK_DIR + '/hw05'
+    dircheck(hwpath)
+    
+    report_csv = hwpath + '/sales_report.csv'
+    
+    # Load the Orders
+    orders = Order.query.filter(Order.salesperson_id != None).all()
+    
+    f = open(report_csv, 'w')
+    for order in orders:
+        num_melons = 0
+        for item in order.items:
+            num_melons += item.quantity
+
+        f.write(",".join([
+            order.salesperson.name(),
+            str(order.order_total),
+            str(num_melons)
+        ]))
+        f.write("\n")
+        
+    f.close()
+
 
 # melon data dictionary definitions
 def homework06_py():
@@ -177,7 +256,6 @@ def homework07_csv():
     # Generate customers.csv
     customers = Customer.query.order_by('id').all()
     
-    random.seed()
     f = open(customers_csv, 'w')
     f.write('customer_id,first,last,email,telephone,called\n')
     for customer in customers:
@@ -227,19 +305,20 @@ def homework07_csv():
         f.write("\n")
 
 def generate_logs():
+
     print "Generating:"
-    print "Homework 01"
-    homework01_log()
-    print "Homework 02"
-    homework02_log()
-    print "Homework 06"
-    homework06_py()
-    print "Homework 07"
-    homework07_csv()
-    pass
+
+    # Get all function names that match the pattern "^homework"
+    methods = sorted(globals().keys())
+    for method in methods:
+        if method.startswith('homework'):
+            print " -> %s" % method
+            # Run the method
+            globals()[method]()
 
 
 def main():
+    random.seed()
     generate_logs()
 
 
