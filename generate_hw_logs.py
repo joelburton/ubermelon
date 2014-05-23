@@ -131,6 +131,50 @@ def old_homework02_log():
         f.close()
 
 
+
+def homework03_log():
+    hwpath = HOMEWORK_DIR + '/hw03'
+    dircheck(hwpath)
+
+    report_csv = hwpath + '/orders_by_type.csv'
+    
+    orders = Order.query.order_by('id').limit(1000).all()
+
+    f = open(report_csv, 'w')
+    for order in orders:
+        mtypes = {}
+        for item in order.items:
+            mtypes.setdefault(item.melon.melon_type, 0)
+            mtypes[item.melon.melon_type] += item.quantity
+            
+        for mtype in mtypes.keys():
+            f.write(','.join([
+                str(order.id),
+                mtype,
+                str(mtypes[mtype])
+            ]))
+            f.write("\n")
+    
+    f.close()
+    
+    # Sales orders
+    orders = Order.query.order_by('id').limit(1000).all()
+    
+    report_csv = hwpath + '/orders_with_sales.csv'
+    
+    f = open(report_csv, 'w')
+    for order in orders:
+        f.write(','.join([
+            str(order.id),
+            str(order.salesperson_id) if order.salesperson_id else '0',
+            order.salesperson.name() if order.salesperson else 'ONLINE',
+            str(order.order_total)
+        ]))
+        f.write("\n")
+        
+    f.close()
+
+
 # customers and how many melons they ordered / paid for for single type of melon
 # pick one type of melon
 # customer name, no. of melon, how much they paid
